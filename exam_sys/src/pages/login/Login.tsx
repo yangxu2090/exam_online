@@ -3,42 +3,35 @@
 
 import React from 'react'
 import {
-  AlipayOutlined,
   LockOutlined,
-  MobileOutlined,
-  TaobaoOutlined,
   UserOutlined,
-  WeiboOutlined,
 } from '@ant-design/icons';
 import {
   LoginFormPage,
-  ProConfigProvider,
-  ProFormCaptcha,
-  ProFormCheckbox,
   ProFormText,
 } from '@ant-design/pro-components';
 import { 
   Button,
-  Divider, 
-  Space, 
   Tabs, 
-  message, 
   theme , 
-  Form,
-  Checkbox,
-  Input,
-  Tag  
+  message
 } from 'antd';
-import type { FormProps } from 'antd';
+import type { FormProps  } from 'antd';
 import type { CSSProperties } from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import style from './Login.module.scss'
+import { getLoginCaptcha, getLogin } from '../../services/login/login'
+import { useNavigate } from 'react-router-dom';
+
+
+
 
 type LoginType = 'phone' | 'account';
 type FieldType = {
   username?: string;
   password?: string;
   remember?: string;
+  code?:string;
 };
 
 const iconStyles: CSSProperties = {
@@ -48,9 +41,7 @@ const iconStyles: CSSProperties = {
   cursor: 'pointer',
 };
 
-const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-  console.log('Success:', values);
-};
+
 
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
   console.log('Failed:', errorInfo);
@@ -62,7 +53,47 @@ const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
 const Login = () => {
   const [loginType, setLoginType] = useState<LoginType>('account');
   const { token } = theme.useToken();
+  const [img,setImg] = useState<string>('')
+  const navigate = useNavigate()
+
+  const onFinish: FormProps<FieldType>['onFinish'] = ({username, password,code} ) => {
+    getLogin({
+      username:username as string,
+      password: password as string,
+      code: code as string
+    }).then(res => {
+      console.log(res)
+      if(res.data.code !== 200){
+        message.error(`${res.data.msg}`)
+        getCaptchas()
+      }
+      message.info('登录成功')
+      localStorage.setItem('token', res.data.data.token)
+      navigate('/')
+    })
+  }
   
+  const getCaptchas = async() => {
+    try{
+      const res = await getLoginCaptcha()
+      if(res.data.code === 200){
+        setImg(res.data.data.code)
+      }else{
+        message.error(res.data.msg)
+      }
+    }catch(e){
+      message.error(`数据异常${e}`)
+    }
+  }
+
+
+  useEffect(()=>{
+    getCaptchas()
+
+  },[])
+
+
+
   return (
     <div
       style={{
@@ -123,8 +154,8 @@ const Login = () => {
           activeKey={loginType}
           onChange={(activeKey) => setLoginType(activeKey as LoginType)}
         >
-          <Tabs.TabPane key={'account'} tab={'账号密码登录'} />
-          <Tabs.TabPane key={'phone'} tab={'手机号登录'} />
+          <Tabs.TabPane key={'account'} tab={'老师登录'} />
+          <Tabs.TabPane key={'phone'} tab={'学生登录'} />
         </Tabs>
         {loginType === 'account' && (
           <>
@@ -193,17 +224,18 @@ const Login = () => {
               ]}
               
             />
-            <Button >图片</Button>
+            <Button onClick={getCaptchas}><img src={img} alt="" /></Button>
               </div>
           </>
         )}
         {loginType === 'phone' && (
           <>
             <ProFormText
+              name="username"
               fieldProps={{
                 size: 'large',
                 prefix: (
-                  <MobileOutlined
+                  <UserOutlined
                     style={{
                       color: token.colorText,
                     }}
@@ -211,20 +243,16 @@ const Login = () => {
                   />
                 ),
               }}
-              name="mobile"
-              placeholder={'手机号'}
+              placeholder={'用户名: root'}
               rules={[
                 {
                   required: true,
-                  message: '请输入手机号！',
-                },
-                {
-                  pattern: /^1\d{10}$/,
-                  message: '手机号格式错误！',
+                  message: '请输入用户名!',
                 },
               ]}
             />
-            <ProFormCaptcha
+            <ProFormText.Password
+              name="password"
               fieldProps={{
                 size: 'large',
                 prefix: (
@@ -236,27 +264,39 @@ const Login = () => {
                   />
                 ),
               }}
-              captchaProps={{
+              placeholder={'密码: 123'}
+              rules={[
+                {
+                  required: true,
+                  message: '请输入密码！',
+                },
+              ]}
+            />
+              <div className={style.codeItem}>
+              <ProFormText
+              name="code"
+              fieldProps={{
                 size: 'large',
+                prefix: (
+                  <LockOutlined
+                    style={{
+                      color: token.colorText,
+                    }}
+                    className={'prefixIcon'}
+                  />
+                ),
               }}
-              placeholder={'请输入验证码'}
-              captchaTextRender={(timing, count) => {
-                if (timing) {
-                  return `${count} ${'获取验证码'}`;
-                }
-                return '获取验证码';
-              }}
-              name="captcha"
+              placeholder={'验证码: xxxx'}
               rules={[
                 {
                   required: true,
                   message: '请输入验证码！',
                 },
               ]}
-              onGetCaptcha={async () => {
-                message.success('获取验证码成功！验证码为：1234');
-              }}
+              
             />
+            <Button onClick={getCaptchas}><img src={img} alt="" /></Button>
+              </div>
           </>
         )}
        
