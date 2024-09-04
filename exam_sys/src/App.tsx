@@ -6,7 +6,6 @@ import routers from './router/index'
 const App = () => {
   const router = useRoutes(routers)
   return router
-  
 }
 
 export default App
