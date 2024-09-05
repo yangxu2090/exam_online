@@ -77,12 +77,17 @@ const Layout:React.FC<AuthProps> = (props) => {
             render: (props, dom) => {
               return (
                 <Dropdown
+                 
                   menu={{
                     items: [
                       {
                         key: 'logout',
                         icon: <LogoutOutlined />,
                         label: '退出登录',
+                        onClick:()=>{
+                          localStorage.removeItem('token')
+                          navigate('/login')
+                        }
                       },
                     ],
                   }}
@@ -113,7 +118,6 @@ const Layout:React.FC<AuthProps> = (props) => {
           <PageContainer>
             <ProCard
               style={{
-                height: '200vh',
                 minHeight: 800,
               }}
             >
