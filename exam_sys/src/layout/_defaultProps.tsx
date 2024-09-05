@@ -10,88 +10,121 @@ export default {
     path: '/',
     routes: [
       {
-        path: '/welcome',
+        path: '/',
         name: '欢迎',
         icon: <SmileFilled />,
-        component: './Welcome',
       },
       {
-        path: '/admin',
-        name: '管理页',
+        path: '/userManage',
+        name: '系统管理',
         icon: <CrownFilled />,
-        access: 'canAdmin',
-        component: './Admin',
         routes: [
           {
-            path: '/admin/sub-page1',
-            name: '一级页面',
-            icon: 'https://gw.alipayobjects.com/zos/antfincdn/upvrAjAPQX/Logo_Tech%252520UI.svg',
-            component: './Welcome',
+            path: '/userManage/system',
+            name: '角色管理',
+            icon: <CrownFilled />,
           },
           {
-            path: '/admin/sub-page2',
-            name: '二级页面',
+            path: '/userManage/menuManage',
+            name: '权限管理',
             icon: <CrownFilled />,
-            component: './Welcome',
+
           },
           {
-            path: '/admin/sub-page3',
-            name: '三级页面',
+            path: '/userManage/personal',
+            name: '个人信息',
             icon: <CrownFilled />,
-            component: './Welcome',
+          },
+          {
+            path: '/userManage/userOptions',
+            name: '用户',
+            icon: <CrownFilled />,
+          },
+          {
+            path: '/userManage/manage-page',
+            name: '用户管理',
+            icon: <CrownFilled />,
           },
         ],
       },
       {
-        name: '列表页',
-        icon: <TabletFilled />,
-        path: '/list',
-        component: './ListTableList',
-        routes: [
+        path: '/exam',
+        name: '考试管理',
+        icon: <SmileFilled />,
+        routes:[
           {
-            path: '/list/sub-page',
-            name: '列表页面',
+            path: '/exam/record',
+            name: '考试记录',
             icon: <CrownFilled />,
-            routes: [
-              {
-                path: 'sub-sub-page1',
-                name: '一一级列表页面',
-                icon: <CrownFilled />,
-                component: './Welcome',
-              },
-              {
-                path: 'sub-sub-page2',
-                name: '一二级列表页面',
-                icon: <CrownFilled />,
-                component: './Welcome',
-              },
-              {
-                path: 'sub-sub-page3',
-                name: '一三级列表页面',
-                icon: <CrownFilled />,
-                component: './Welcome',
-              },
-            ],
           },
           {
-            path: '/list/sub-page2',
-            name: '二级列表页面',
+            path: '/exam/create',
+            name: '考试记录',
             icon: <CrownFilled />,
-            component: './Welcome',
           },
-          {
-            path: '/list/sub-page3',
-            name: '三级列表页面',
-            icon: <CrownFilled />,
-            component: './Welcome',
-          },
-        ],
+        ]
       },
-     
+      {
+        path: '/manage-group',
+        name: '班级管理',
+        icon: <SmileFilled />,
+        routes:[
+          {
+            path: '/manage-group/group-list',
+            name: '班级列表',
+            icon: <CrownFilled />,
+          },
+          {
+            path: '/manage-group/group-students',
+            name: '学生列表',
+            icon: <CrownFilled />,
+          },
+          {
+            path: '/manage-group/group-class',
+            name: 'group-class',
+            icon: <CrownFilled />,
+          },
+          {
+            path: '/manage-group/group-detail',
+            name: ':id',
+            icon: <CrownFilled />,
+          },
+        ]
+      },
+      {
+        path: '/question',
+        name: '试题管理',
+        icon: <SmileFilled />,
+        routes:[
+          {
+            path: '/question/item-bank',
+            name: '试题库',
+            icon: <CrownFilled />,
+          },
+          {
+            path: '/question/create-item',
+            name: '添加试题',
+            icon: <CrownFilled />,
+          },
+        ]
+      },
+      {
+        path: '/paper',
+        name: '试卷管理',
+        icon: <SmileFilled />,
+        routes:[
+          {
+            path: '/paper/paper-bank',
+            name: '试卷库',
+            icon: <CrownFilled />,
+          },
+          {
+            path: '/paper/create-paper',
+            name: '创建试卷',
+            icon: <CrownFilled />,
+          },
+        ]
+      },
     ],
   },
-  location: {
-    pathname: '/',
-  },
-
 };

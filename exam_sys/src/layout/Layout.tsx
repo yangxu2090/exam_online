@@ -1,19 +1,21 @@
 import React, { useEffect } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import {  useNavigate,useLocation } from 'react-router-dom';
 import { useInfoApi } from '../services/login/login'
 import { setUserInfo } from '../store/models/user'
-import { useDispatch  } from 'react-redux';
+import { useDispatch ,useSelector } from 'react-redux';
 import { message } from 'antd'
-import {
-  GithubFilled,
-  InfoCircleFilled,
-  QuestionCircleFilled,
-} from '@ant-design/icons';
-import { PageContainer, ProCard, ProLayout } from '@ant-design/pro-components';
-import { useState } from 'react';
+import { PageContainer, ProCard, ProLayout,ProConfigProvider } from '@ant-design/pro-components';
 import defaultProps from './_defaultProps';
+import {
+  LogoutOutlined
+} from '@ant-design/icons';
+import {
+  Dropdown,
+} from 'antd';
 
-
+import type { RootState } from '../store'
+import { Suspense } from 'react'
+import ProSkeleton from '@ant-design/pro-skeleton';
 interface AuthProps {
   children: React.ReactNode;
 }
@@ -21,12 +23,12 @@ interface AuthProps {
 const Layout:React.FC<AuthProps> = (props) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const [pathname, setPathname] = useState('/list/sub-page/sub-sub-page1');
+  const location = useLocation()
+  const userInfo = useSelector((state: RootState) => state.user)
 
   useEffect(()=>{
     useInfoApi()
      .then(res => {
-      console.log(res.data)
       if(res.data.code === 200){
         dispatch(setUserInfo(res.data.data))
       }
@@ -41,68 +43,97 @@ const Layout:React.FC<AuthProps> = (props) => {
   },[])
 
 
-  return  (<div
-  id="test-pro-layout"
-  style={{
-    height: '100vh',
-  }}
->
-  <ProLayout
-    siderWidth={216}
-    bgLayoutImgList={[
-      {
-        src: 'https://img.alicdn.com/imgextra/i2/O1CN01O4etvp1DvpFLKfuWq_!!6000000000279-2-tps-609-606.png',
-        left: 85,
-        bottom: 100,
-        height: '303px',
-      },
-      {
-        src: 'https://img.alicdn.com/imgextra/i2/O1CN01O4etvp1DvpFLKfuWq_!!6000000000279-2-tps-609-606.png',
-        bottom: -68,
-        right: -45,
-        height: '303px',
-      },
-      {
-        src: 'https://img.alicdn.com/imgextra/i3/O1CN018NxReL1shX85Yz6Cx_!!6000000005798-2-tps-884-496.png',
-        bottom: 0,
-        left: 0,
-        width: '331px',
-      },
-    ]}
-    {...defaultProps}
-    location={{
-      pathname,
-    }}
-    avatarProps={{
-      src: 'https://gw.alipayobjects.com/zos/antfincdn/efFD%24IOql2/weixintupian_20170331104822.jpg',
-      title: '七妮妮',
-      size: 'small',
-    }}
-   
-    menuItemRender={(item, dom) => (
-      <div
-        onClick={() => {
-          setPathname(item.path || '/welcome');
-        }}
-      >
-        {dom}
-      </div>
-    )}
-  >
-    <PageContainer>
-      <ProCard
+
+  return  (
+    <div
+      id="test-pro-layout"
+      style={{
+        height: '100vh',
+        overflow: 'auto',
+      }}
+    >
+      <ProConfigProvider hashed={false}>
+        <ProLayout
+          title="online"
+          logo="https://cn.redux.js.org/img/redux.svg"
+          prefixCls="my-prefix"
+          {...defaultProps}
+          location={{
+            pathname: location.pathname,
+          }}
+          token={{
+            header: {
+              colorBgMenuItemSelected: 'rgba(0,0,0,0.04)',
+            },
+          }}
+          siderMenuType="group"
+          menu={{
+            collapsedShowGroupTitle: true,
+          }}
+          avatarProps={{
+            src: userInfo.avator || 'https://gw.alipayobjects.com/zos/antfincdn/efFD%24IOql2/weixintupian_20170331104822.jpg',
+            size: 'small',
+            title: userInfo.username,
+            render: (props, dom) => {
+              return (
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: 'logout',
+                        icon: <LogoutOutlined />,
+                        label: '退出登录',
+                      },
+                    ],
+                  }}
+                >
+                  {dom}
+                </Dropdown>
+              );
+            },
+          }}
+          menuItemRender={(item, dom, props) => (
+            <div
+              onClick={() => {
+                const cur = props.route?.routes.find((v:any) => v.path === item.path)
+                if (cur?.routes) {
+                  navigate(cur?.routes[0].path)
+                } else {
+                  navigate(item.path!)
+                }
+              }}
+            >
+              {dom}
+            </div>
+          )}
+          fixSiderbar={true}
+          layout="mix"
+          splitMenus={true}
+        >
+          <PageContainer>
+            <ProCard
+              style={{
+                height: '200vh',
+                minHeight: 800,
+              }}
+            >
+               <Suspense fallback={<div
         style={{
-          height: '100vh',
-          minHeight: 800,
+          background: '#fafafa',
+          padding: 24,
         }}
       >
-        {props.children}
-        <div />
-      </ProCard>
-    </PageContainer>
-  </ProLayout>
-</div>
-)
+        <ProSkeleton type="list" />
+    </div>}>
+      {props.children}
+          </Suspense> 
+            </ProCard>
+          </PageContainer>
+        </ProLayout>
+      </ProConfigProvider>
+    </div>
+  );
+
 };
 
 export default Layout;
