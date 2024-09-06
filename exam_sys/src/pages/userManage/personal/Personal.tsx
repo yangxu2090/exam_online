@@ -9,7 +9,7 @@ import { Flex, message, Upload, Space,Button } from 'antd';
 import type { GetProp, UploadProps } from 'antd';
 import { getUserListApi } from '../../../services/userManage/personal'
 import { useSelector } from 'react-redux';
-
+import type { RootState } from '../../../store/index'
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
 const getBase64 = (img: FileType, callback: (url: string) => void) => {
@@ -32,6 +32,8 @@ const beforeUpload = (file: FileType) => {
 
 
 const Personal: React.FC  = () => {
+  const userInfo = useSelector((state:RootState ) => state.user)
+
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>();
 
@@ -43,7 +45,12 @@ const Personal: React.FC  = () => {
     if (info.file.status === 'done') {
       // Get this url from response in real world.
       getBase64(info.file.originFileObj as FileType, (url) => {
-        console.log('上传成功')
+        getUserListApi({id:userInfo._id,avatar:url })
+        .then(res => {
+          console.log(res)
+        }).catch(e => {
+          message.error(`图片上传异常${e}`)
+        })
         setLoading(false);
         setImageUrl(url);
       });
@@ -73,10 +80,10 @@ const Personal: React.FC  = () => {
        </Flex>
     </Space>
 
-      <p>用户名称：</p>
-      <p>性别：</p>
-      <p>年龄：</p>
-      <p>邮箱地址：</p>
+      <p>用户名称：{userInfo.username}</p>
+      <p>性别：{userInfo.sex}</p>
+      <p>年龄：{userInfo.age}</p>
+      <p>邮箱地址：{userInfo.email}</p>
 
    <div style={{marginTop:'20px'}}>
    <Space>
