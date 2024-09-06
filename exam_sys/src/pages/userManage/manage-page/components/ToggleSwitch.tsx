@@ -8,6 +8,8 @@ interface Props {
   username: string
   _id: string,
   isModalOpen:boolean
+  number:number
+  setNumber:(n:number)=>void
 }
 
 const ToggleSwitch:React.FC<Props> = (props) => {
@@ -17,7 +19,6 @@ const ToggleSwitch:React.FC<Props> = (props) => {
   const toggoleApi = async() => {
     try{
       const res = await UpdataUserApi({ id: props._id , username: props.username, status: toggle ? 1 : 0})
-      console.log('执行了')
       if(res.data.code === 200){
         message.success("修改成功")
       }else{
@@ -29,18 +30,11 @@ const ToggleSwitch:React.FC<Props> = (props) => {
     }
   }
   useEffect(()=>{
-    // console.log('运行了')
-    setOneShow(true)
-    setToggle(props.status === 1 ? true : false)
-   
+    if(!props.isModalOpen){
+      setToggle(props.status === 1 ? true : false)
+    }
   },[props.isModalOpen])
 
-  useEffect(()=>{
-    if(oneSHow){
-      toggoleApi()
-    }
-    setOneShow(true)
-  },[toggle])
 
   return (
     <div>

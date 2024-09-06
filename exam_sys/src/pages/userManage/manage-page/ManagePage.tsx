@@ -16,7 +16,7 @@ import Edit  from '../manage-page/components/Edit'
 import type { UpParams } from '../../../type/userManage/userList'
 import type { PopconfirmProps } from 'antd';
 import Assigning from './components/Assigning'
-
+import Creation from './components/Creation'
 
 
 
@@ -31,7 +31,9 @@ const cancel: PopconfirmProps['onCancel'] = (e) => {
 const ManagePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // 编辑开关
   const [isAssigning, setIsAssigning] = useState(false); // 分配角色开关
+  const [craete, setCraete] = useState(false) // 新建用户开关
   const [editUserInfo, setEditUserInfo] = useState<UpParams>({})
+  const [number, setNumber] = useState(0)
   const [params, setParams] = useState<Params>({
     page:1,
     pagesize: 5
@@ -52,6 +54,7 @@ const ManagePage = () => {
     }
     
   };
+  // 获取列表数据接口
   const getUserList = async () => {
     try{
       const res = await getUserListApi(params)
@@ -78,6 +81,8 @@ const ManagePage = () => {
       key: 'status',
       render:(_, record) => {
         return <ToggleSwitch 
+                setNumber={setNumber}
+                number={number}
                 isModalOpen={isModalOpen}
                 status={record.status}
                 username={record.username}
@@ -153,11 +158,38 @@ const ManagePage = () => {
 
   useEffect(()=>{
     getUserList()
-  },[params, isModalOpen,isAssigning])
+  },[params])
+  useEffect(()=>{
+    if(!isAssigning){
+      getUserList()
+    }
+  },[isAssigning])
+  useEffect(()=>{
+    if(!craete){
+      getUserList()
+    }
+  },[craete])
+
+  useEffect(()=>{
+    getUserList()
+  },[number])
+
+  useEffect(()=>{
+    if(!isModalOpen){
+      getUserList()
+      setEditUserInfo({})
+    }
+  },[isModalOpen])
+
+
 
   return (
     <div>
+      <Space>
+        <Button size="large" type="primary" onClick={()=>setCraete(true)}>添加用户</Button>
+      </Space>
       <Table 
+      style={{marginTop:'20px'}}
       columns={columns} 
       dataSource={data}
       rowKey='_id'
@@ -187,6 +219,11 @@ const ManagePage = () => {
         isAssigning={isAssigning}
         setIsAssigning={setIsAssigning}
       ></Assigning>}
+      {craete && <Creation
+      craete={craete}
+      setCraete={setCraete}
+      >
+        </Creation>}
     </div>
   )
 }

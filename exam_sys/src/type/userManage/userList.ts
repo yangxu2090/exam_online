@@ -22,6 +22,10 @@ export interface User {
   avator?:string
   role:string[]
   id?:string
+  sex?: 0 | 1
+  email?: string
+  age?: number
+
 }
 
 //  用户管理界面返回的类型

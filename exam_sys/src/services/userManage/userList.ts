@@ -23,10 +23,16 @@ export const RemoveUserApi = (params:UpParams) => {
   return axios.post<Base>('/user/remove',params)
 }
 
+// 创建用户
+export const CreateUserApi = (params:UpParams) => {
+  return axios.post<Base>('/user/create',params)
+}
 
 
-
-
+// // 查询角色
+export const GetListRole = () => {
+  return axios.get<Base>('/role/list')
+}
 
 
 

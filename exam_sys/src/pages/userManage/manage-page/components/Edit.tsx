@@ -1,7 +1,7 @@
 
 
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Modal,Form, Space  } from "antd"
 import { Button, Checkbox, Radio, Input, message } from 'antd';
 import type { FormProps } from 'antd';
@@ -57,6 +57,23 @@ const Edit:React.FC<Props> = (props) => {
     })
   
   }
+  useEffect(()=>{
+    if(props.editUserInfo){
+      form.setFieldsValue({ 
+        username:props.editUserInfo.username,
+        password:props.editUserInfo.password,
+        confirmpassword:props.editUserInfo.password,
+        radioGroup:props.editUserInfo.status
+      })
+    }
+  },[props.editUserInfo])
+
+  useEffect(()=>{
+    if(!props.isModalOpen){
+      form.resetFields()
+    }
+  },[props.isModalOpen])
+
 
   return (
     <Modal title="编辑用户" 
@@ -67,7 +84,6 @@ const Edit:React.FC<Props> = (props) => {
     onCancel={()=>{
       props.setIsModalOpen(false)
     }}>
-      
       <Space>
       <Form
     name="basic"
@@ -75,12 +91,7 @@ const Edit:React.FC<Props> = (props) => {
     labelCol={{ span: 8 }}
     wrapperCol={{ span: 16 }}
     style={{ maxWidth: 600 }}
-    initialValues={{ 
-      username:props.editUserInfo.username,
-      password:props.editUserInfo.password,
-      confirmpassword:props.editUserInfo.password,
-      radioGroup:props.editUserInfo.status
-    }}
+
     autoComplete="off"
   >
     <Form.Item<FieldType>
