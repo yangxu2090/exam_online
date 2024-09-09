@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {  useNavigate,useLocation } from 'react-router-dom';
 import { useInfoApi } from '../services/login/login'
 import { setUserInfo } from '../store/models/user'
@@ -11,11 +11,13 @@ import {
 } from '@ant-design/icons';
 import {
   Dropdown,
+  Spin 
 } from 'antd';
 
 import type { RootState } from '../store'
 import { Suspense } from 'react'
 import ProSkeleton from '@ant-design/pro-skeleton';
+
 interface AuthProps {
   children: React.ReactNode;
 }
@@ -25,12 +27,14 @@ const Layout:React.FC<AuthProps> = (props) => {
   const navigate = useNavigate()
   const location = useLocation()
   const userInfo = useSelector((state: RootState) => state.user)
-
+  const [loding, setLoding] = useState(false)
   useEffect(()=>{
+    setLoding(true)
     useInfoApi()
      .then(res => {
       if(res.data.code === 200){
         dispatch(setUserInfo(res.data.data))
+        setLoding(false)
       }
      }).catch(e => {
       if(e.status === 401){
@@ -39,12 +43,15 @@ const Layout:React.FC<AuthProps> = (props) => {
       }else{
         message.error('请求失败')
       }
+      setLoding(true)
      })
   },[])
 
 
+  if(loding) return <Spin />
 
   return  (
+    
     <div
       id="test-pro-layout"
       style={{
@@ -87,6 +94,14 @@ const Layout:React.FC<AuthProps> = (props) => {
                         onClick:()=>{
                           localStorage.removeItem('token')
                           navigate('/login')
+                        }
+                      },
+                      {
+                        key: 'useInfo',
+                        icon: <LogoutOutlined />,
+                        label: '个人信息',
+                        onClick:()=>{
+                            navigate('/userManage/personal')
                         }
                       },
                     ],

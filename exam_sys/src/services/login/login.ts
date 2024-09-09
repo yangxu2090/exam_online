@@ -4,19 +4,19 @@ import type { LoginCaptcha, Login, LoginResponse, UserInfoAll ,UserInfoType} fro
 
 // axios.defaults.baseURL = 'https://zyxcl.xyz/exam_api'
 axios.defaults.baseURL = '/bwapi'
-
+import request from '../request'
 
 
 
 // 获取图形验证码接口
 export const getLoginCaptcha = () => {
-  return axios.get<LoginCaptcha>('/login/captcha')
+  return request.get<LoginCaptcha>('/login/captcha')
 }
 
 
 //登录接口 
 export const  getLogin = (params: Login) => {
-  return axios.post<LoginResponse>('/login', {
+  return request.post<LoginResponse>('/login', {
     ...params
   })
 }
@@ -24,11 +24,7 @@ export const  getLogin = (params: Login) => {
 
 // 个人信息大全页面
 export const useInfoApi = () => {
-  return axios.get('/user/info',{
-    headers:{
-      authorization: localStorage.getItem('token')
-    }
-  })
+  return request.get('/user/info')
 }
 
 

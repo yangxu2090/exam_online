@@ -18,7 +18,7 @@ const ToggleSwitch:React.FC<Props> = (props) => {
 
   const toggoleApi = async() => {
     try{
-      const res = await UpdataUserApi({ id: props._id , username: props.username, status: toggle ? 1 : 0})
+      const res = await UpdataUserApi({ id: props._id , status: toggle ? 0 : 1})
       if(res.data.code === 200){
         message.success("修改成功")
       }else{
@@ -30,10 +30,8 @@ const ToggleSwitch:React.FC<Props> = (props) => {
     }
   }
   useEffect(()=>{
-    if(!props.isModalOpen){
-      setToggle(props.status === 1 ? true : false)
-    }
-  },[props.isModalOpen])
+    setToggle(props.status === 1 ? true : false)
+  },[props.status])
 
 
   return (
@@ -47,6 +45,8 @@ const ToggleSwitch:React.FC<Props> = (props) => {
         disabled={props.username === 'root'}
         onChange={(checked)=> {
           setToggle(checked)
+          toggoleApi()
+          props.setNumber(props.number + 1)
         }}
         />
       </Space>

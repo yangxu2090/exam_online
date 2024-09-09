@@ -3,7 +3,7 @@
 
 
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { getUserListApi,RemoveUserApi } from '../../../services/userManage/userList'
 import type { Params, User } from '../../../type/userManage/userList'
 import { message, Table ,Space,Tag ,Button,Image,Popconfirm  } from "antd"
@@ -17,9 +17,9 @@ import type { UpParams } from '../../../type/userManage/userList'
 import type { PopconfirmProps } from 'antd';
 import Assigning from './components/Assigning'
 import Creation from './components/Creation'
+import Search from './components/Search'
 
-
-
+import type { ParamsForm, SearchRef } from './components/Search'
 
 const cancel: PopconfirmProps['onCancel'] = (e) => {
   message.error('点击了取消');
@@ -40,6 +40,9 @@ const ManagePage = () => {
   })
   const [data, setData] = useState<User[]>([])
   const [total, setTotal] = useState(0)
+  const [searchContent,setSearchContent] = useState<ParamsForm | null>(null)
+  const  searchRef = useRef<SearchRef>(null)
+
   const confirm = async (id :string) => {
     try{
       const res = await RemoveUserApi({id})
@@ -49,8 +52,8 @@ const ManagePage = () => {
       }else{
         message.success('出现了异常');
       }
-    }catch(e){
-      message.error('出现了异常');
+    }catch(error){
+     console.log(error)
     }
     
   };
@@ -158,7 +161,8 @@ const ManagePage = () => {
 
   useEffect(()=>{
     getUserList()
-  },[params])
+  },[params,number])
+
   useEffect(()=>{
     if(!isAssigning){
       getUserList()
@@ -185,8 +189,24 @@ const ManagePage = () => {
 
   return (
     <div>
+      <Search ref={searchRef}  onchange={setSearchContent}></Search>
       <Space>
         <Button size="large" type="primary" onClick={()=>setCraete(true)}>添加用户</Button>
+        <Button size="large" type="primary" onClick={()=>{
+          setParams({
+            ...searchContent,
+            page:params.page,
+            pagesize: params.pagesize
+          })
+        }}>搜索</Button>
+        <Button size="large" type="default" onClick={()=>{
+          searchRef.current?.form.resetFields()
+          setSearchContent(null)
+          setParams({
+            page:params.page,
+            pagesize: params.pagesize
+          })
+        }}>重置</Button>
       </Space>
       <Table 
       style={{marginTop:'20px'}}
@@ -202,6 +222,7 @@ const ManagePage = () => {
         pageSizeOptions:[5,10,15],
         onChange:(page, pagesize) => {
           setParams({
+            ...searchContent,
             page,
             pagesize
           })

@@ -12,17 +12,17 @@ export type Params = {
 }
 
 export interface User {
-  creator: string
-  lastOnlineTime: number
-  password: string
-  status: 0 | 1
-  username:string
-  __v:number
-  _id:string
+  creator?: string
+  lastOnlineTime?: number
+  password?: string
+  status?: 0 | 1
+  username?:string
+  __v?:number
+  _id?:string
   avator?:string
   role:string[]
   id?:string
-  sex?: 0 | 1
+  sex?: 0 | 1 | '男' | "女"
   email?: string
   age?: number
 
@@ -37,6 +37,8 @@ export type  GetUserListApi = Base<{
 //  修改用户信息
 export type UpParams = Partial<User>
 
+// 更新用户信息
+export type UpdateUserListParams = { id: string } & Partial<Omit<User, 'creator' | 'lastOnlineTime' | '_id'|'id'>>
 
 //  修改用户信息
 // export type  ModifyParams = {

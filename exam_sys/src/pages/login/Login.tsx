@@ -68,6 +68,10 @@ const Login = () => {
         getCaptchas()
       }
       message.info('登录成功')
+      // const obj = {
+      //   token:res.data.data.token,
+      //   expires: 600000
+      // }
       localStorage.setItem('token', res.data.data.token)
       navigate('/')
     })
