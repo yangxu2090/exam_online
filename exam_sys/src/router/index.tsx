@@ -4,7 +4,7 @@ import React,{lazy} from 'react';
 import Layout from '../layout/Layout';
 import Home from '../pages/home/Home';
 import Login from '../pages/login/Login';
-
+import Auth from '../comenpents/auth/Auth'
 // import ManagePage from '../pages/userManage/manage-page/ManagePage'
 // import MenuManage from '../pages/userManage/menuManage/MenuManage'
 // import Personal from '../pages/userManage/personal/Personal'
@@ -63,20 +63,20 @@ const routers: RouteConfig[] = [
 
   {
     path: '/paper/create-paper',
-    element: <Layout><CreatePaper /></Layout>,
+    element: <CreatePaper />
   },
   {
     path: '/paper/paper-bank',
-    element: <Layout><PaperBank /></Layout>,
+    element: <PaperBank />,
   },
 
   {
     path: '/question/create-item',
-    element: <Layout><CreateItem /></Layout>,
+    element: <CreateItem />,
   },
   {
     path: '/question/item-bank',
-    element: <Layout><ItemBank /></Layout>,
+    element: <ItemBank />,
   },
 
 
@@ -89,19 +89,19 @@ const routers: RouteConfig[] = [
 
   {
     path: '/manage-group/group-students',
-    element: <Layout><GroupStudents /></Layout>,
+    element: <GroupStudents />,
   },
   {
     path: '/manage-group/group-list',
-    element: <Layout><GroupList /></Layout>,
+    element: <GroupList />,
   },
   {
-    path: '/manage-group/group-detail',
-    element: <Layout><GroupDetail /></Layout>,
+    path: '/group-detail/:id',
+    element: <GroupDetail />,
   },
   {
     path: '/manage-group/group-class',
-    element: <Layout><GroupClass /></Layout>,
+    element: <GroupClass />,
   },
 
 
@@ -115,48 +115,51 @@ const routers: RouteConfig[] = [
 
   {
     path: '/exam/create',
-    element: <Layout><Create /></Layout>,
+    element:<Create />,
   },
   {
     path: '/exam/record',
-    element: <Layout><Record /></Layout>,
+    element:<Record />,
   },
 
 
   {
     path: '/userManage/manage-page',
-    element: <Layout><ManagePage /></Layout>,
+    element: <ManagePage />,
   },
   {
     path: 'userManage/personal',
-    element: <Layout><Personal /></Layout>,
+    element: <Personal />,
   },
   {
     path: 'userManage/menuManage',
-    element: <Layout><MenuManage /></Layout>,
+    element: <MenuManage />,
   },
   {
     path: 'userManage/system',
-    element: <Layout><System /></Layout>,
+    element: <System />,
   },
   {
     path: 'userManage/userOptions',
-    element: <Layout><UserOptions /></Layout>,
+    element:<UserOptions />,
   },
-
-
-
-
-
-
-
-
-
-
 
   {
     path: '/login',
     element: <Login />,
+  },
+  {
+    path: '/403',
+    element: <Result
+      status="403"
+      title="403"
+      subTitle="抱歉没有该权限，请联系管理员"
+      extra={
+        <Link to="/">
+          <Button type="primary">回到首页</Button>
+        </Link>
+      }
+    />
   },
   {
     path: '*',
@@ -173,34 +176,144 @@ const routers: RouteConfig[] = [
   }
 ];
 
-// interface TitleComProps {
-//   title?: string;
-//   isAuth?: boolean;
-//   children: React.ReactNode;
-// }
 
-// const TitleCom = (props: TitleComProps) => {
-//   if (props.title) {
-//     document.title = props.title;
+// 定义 formatRoutes 函数的类型
+const formatRoutes = (routers:RouteConfig[] ) => {
+  return routers.map((item:RouteConfig) => {
+   if(item.path !== '*' && item.path !== '/403' && item.path !== '/login' &&  item.path !== '/home' && item.path !== '/'){
+    return {
+      ...item,
+      element:  <Layout><Auth>{item.element}</Auth></Layout>
+    }
+   }
+   return item
+  })
+}
+
+export default formatRoutes(routers)
+
+
+// const routers: RouteConfig[] = [
+//   {
+//     path: '/',
+//     element: <Navigate to="/home" replace />,
+//   },
+//   {
+//     path: '/home',
+//     element: <Layout><Home /></Layout>,
+//   },
+
+//   {
+//     path: '/paper/create-paper',
+//     element: <Layout><CreatePaper /></Layout>,
+//   },
+//   {
+//     path: '/paper/paper-bank',
+//     element: <Layout><PaperBank /></Layout>,
+//   },
+
+//   {
+//     path: '/question/create-item',
+//     element: <Layout><CreateItem /></Layout>,
+//   },
+//   {
+//     path: '/question/item-bank',
+//     element: <Layout><ItemBank /></Layout>,
+//   },
+
+
+
+
+
+
+
+
+
+//   {
+//     path: '/manage-group/group-students',
+//     element: <Layout><GroupStudents /></Layout>,
+//   },
+//   {
+//     path: '/manage-group/group-list',
+//     element: <Layout><GroupList /></Layout>,
+//   },
+//   {
+//     path: '/group-detail/:id',
+//     element: <Layout><GroupDetail /></Layout>,
+//   },
+//   {
+//     path: '/manage-group/group-class',
+//     element: <Layout><GroupClass /></Layout>,
+//   },
+
+
+
+
+
+
+
+
+
+
+//   {
+//     path: '/exam/create',
+//     element: <Layout><Create /></Layout>,
+//   },
+//   {
+//     path: '/exam/record',
+//     element: <Layout><Record /></Layout>,
+//   },
+
+
+//   {
+//     path: '/userManage/manage-page',
+//     element: <Layout><ManagePage /></Layout>,
+//   },
+//   {
+//     path: 'userManage/personal',
+//     element: <Layout><Personal /></Layout>,
+//   },
+//   {
+//     path: 'userManage/menuManage',
+//     element: <Layout><MenuManage /></Layout>,
+//   },
+//   {
+//     path: 'userManage/system',
+//     element: <Layout><System /></Layout>,
+//   },
+//   {
+//     path: 'userManage/userOptions',
+//     element: <Layout><UserOptions /></Layout>,
+//   },
+
+//   {
+//     path: '/login',
+//     element: <Login />,
+//   },
+//   {
+//     path: '/403',
+//     element: <Result
+//       status="403"
+//       title="403"
+//       subTitle="抱歉没有该权限，请联系管理员"
+//       extra={
+//         <Link to="/">
+//           <Button type="primary">回到首页</Button>
+//         </Link>
+//       }
+//     />
+//   },
+//   {
+//     path: '*',
+//     element: <Result
+//       status="404"
+//       title="404"
+//       subTitle="Sorry, the page you visited does not exist."
+//       extra={
+//         <Link to="/">
+//           <Button type="primary">回到首页</Button>
+//         </Link>
+//       }
+//     />
 //   }
-//   if (props.isAuth) {
-//     return <Auth>{props.children}</Auth>;
-//   }
-//   return <>{props.children}</>;
-// };
-
-// // 定义 formatRoutes 函数的类型
-// const formatRoutes = (routeConfig: RouteConfig[]) => routeConfig.map((item: RouteConfig) => {
-//   return {
-//     path: item.path,
-//     element: (
-//       <TitleCom title={item.title} isAuth={item.isAuth}>
-//         {item.element}
-//       </TitleCom>
-//     ),
-//     children: item.children ? formatRoutes(item.children) : undefined,
-//   };
-// });
-
-// export default formatRoutes(routers);
-export default routers
+// ];

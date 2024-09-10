@@ -5,7 +5,6 @@ import { setUserInfo } from '../store/models/user'
 import { useDispatch ,useSelector } from 'react-redux';
 import { message } from 'antd'
 import { PageContainer, ProCard, ProLayout,ProConfigProvider } from '@ant-design/pro-components';
-import defaultProps from './_defaultProps';
 import {
   LogoutOutlined
 } from '@ant-design/icons';
@@ -17,17 +16,18 @@ import {
 import type { RootState } from '../store'
 import { Suspense } from 'react'
 import ProSkeleton from '@ant-design/pro-skeleton';
-
+import { menulistApi } from '../services/login/login'
+import type { Menulist } from '../type/services/login'
 interface AuthProps {
   children: React.ReactNode;
 }
-
 const Layout:React.FC<AuthProps> = (props) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
   const userInfo = useSelector((state: RootState) => state.user)
   const [loding, setLoding] = useState(false)
+  const [meulist, setMeulist] = useState<Menulist[]>([])
   useEffect(()=>{
     setLoding(true)
     useInfoApi()
@@ -47,6 +47,22 @@ const Layout:React.FC<AuthProps> = (props) => {
      })
   },[])
 
+  useEffect(()=>{
+    menulistApi()
+      .then(res => {
+        const meuli = res.data.data.list.map((item:Menulist)  => {
+          return {
+            ...item,
+            routes:item.children
+          }
+        })
+        setMeulist(meuli)
+      })
+      .catch(e => {
+        console.log(e)
+      })
+  },[])
+
 
   if(loding) return <Spin />
 
@@ -64,7 +80,16 @@ const Layout:React.FC<AuthProps> = (props) => {
           title="online"
           logo="https://cn.redux.js.org/img/redux.svg"
           prefixCls="my-prefix"
-          {...defaultProps}
+          route = {{
+            path: '/',
+            routes: [
+              {
+                path: '/',
+                name: '欢迎',
+              },
+              ...meulist
+            ],
+          }}
           location={{
             pathname: location.pathname,
           }}

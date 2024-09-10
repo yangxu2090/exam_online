@@ -27,7 +27,10 @@ export const useInfoApi = () => {
   return request.get('/user/info')
 }
 
-
+//获取左侧菜单
+export const menulistApi = () => {
+  return request.get('/user/menulist')
+}
 
 
 

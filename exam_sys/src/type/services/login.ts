@@ -55,4 +55,12 @@ export type UserInfoType  = BaseRes<{
 }>
 
 
+export interface Menulist {
+  name:string
+  path:string
+  _id:string
+  children:Menulist[]
+  [key:string]: any
+}
+
 
