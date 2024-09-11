@@ -5,10 +5,10 @@ import React, { useEffect, useState } from 'react'
 import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
-import { Button, Dropdown, Space, Tag } from 'antd';
+import { Button, Dropdown, Space, Tag ,Form, message} from 'antd';
 import { useRef } from 'react';
-import request from 'umi-request';
-import { studentGroupList } from '../../../services/groupList/GroupList'
+import { studentGroupList,updateStudentGroupListApi } from '../../../services/groupList/GroupList'
+import { useForm } from 'antd/es/form/Form';
 
 export const waitTimePromise = async (time: number = 100) => {
   return new Promise((resolve) => {
@@ -23,6 +23,7 @@ export const waitTime = async (time: number = 100) => {
 };
 
 type GithubIssueItem = {
+  valueType:string
   dataIndex:string
   url: string;
   id: number;
@@ -37,12 +38,22 @@ type GithubIssueItem = {
   created_at: string;
   updated_at: string;
   closed_at?: string;
+  _id: string;
+
+  name: string; // 班级名称
+  teacher: string; // 老师
+  classify: string; // 科目类别
+  createTime: string; // 创建时间
 };
 
 
 const GroupList = () => {
   const actionRef = useRef<ActionType>();
-  const [data, setDate] = useState([])
+  const [form] =  Form.useForm()
+  const [pageParam, setPageParam] = useState({
+    page: 1,
+    pageSize:5
+  })
 
   // const getListApi = async () => {
   //   const res = await studentGroupList({page:1,pagesize:5})
@@ -60,33 +71,38 @@ const GroupList = () => {
     },
     {
       title: '班级名称',
-      key: 'showTime',
-      dataIndex: 'classify',
-      // valueType: 'classify',
-      sorter: true,
+      key: 'name',
+      dataIndex: 'name',
+      valueType: 'text',
+      width: 100,
+      // copyable: true, // 是否支持复制
+      // ellipsis: true, //是否自动缩略
+      // sorter: true, //是否支持复制
+      // hideInSearch: true,//在查询表单中不展示此项	
+    },
+    {
+      title: '老师',
+      key: 'teacher',
+      dataIndex: 'teacher',
+      valueType: 'text',
+      // sorter: true,
       hideInSearch: true,
     },
     {
-      title: '班级名称',
+      title: '科目类别',
+      key: 'classify',
       dataIndex: 'classify',
-      copyable: true,
-      tooltip: '标题过长会自动收缩',
-      formItemProps: {
-        rules: [
-          {
-            required: true,
-            message: '此项为必填项',
-          },
-        ],
-      },
+      valueType: 'text',
+      // sorter: true,
+      hideInSearch: true,
     },
-   
+
     {
       title: '创建时间',
-      key: 'showTime',
-      dataIndex: 'created_at',
+      key: 'createTime',
+      dataIndex: 'createTime',
       valueType: 'date',
-      sorter: true,
+      // sorter: true,
       hideInSearch: true,
     },
     {
@@ -111,7 +127,7 @@ const GroupList = () => {
         <a
           key="editable"
           onClick={() => {
-            action?.startEditable?.(record.id);
+            action?.startEditable?.(record._id);
           }}
         >
           编辑
@@ -131,32 +147,44 @@ const GroupList = () => {
     },
   ];
 
-  // useEffect(()=>{
-  //   getListApi()
-  // },[])
 
   return (
     <>
     <ProTable<GithubIssueItem>
+      rowKey='_id'
       columns={columns}
       actionRef={actionRef}
       cardBordered
+      // form={form}
       request={async (params, sort, filter) => {
         await waitTime(2000);
+       
         const res = await studentGroupList({
-          page: params.current as number,
-          pagesize: params.pageSize as number,
+          page: pageParam.page as number,
+          pagesize: pageParam.pageSize as number,
         });
-        console.log('数据', res.data.data.total)
-       return {
-        data: res.data.data.list,
-        success: true,
-        total: res.data.data.total,
-       }
+        console.log('数据', res.data.data.list[0]);
+        return {
+          data: res.data.data.list,
+          success: true,
+          total: res.data.data.total,
+        };
       }}
       
       editable={{
         type: 'multiple',
+        onSave: async (key, row, originRow) =>{
+          const res = await updateStudentGroupListApi({
+            id: key as string,
+            name: row.name,
+            teacher: row.teacher,
+            classify: row.classify,
+            createTime: Number(row.createTime) as number,
+          })
+          if(res.data.code === 200){
+            message.success('修改成功')
+          }
+        }
       }}
       columnsState={{
         persistenceKey: 'pro-table-singe-demos',
@@ -165,10 +193,11 @@ const GroupList = () => {
           option: { fixed: 'right', disable: true },
         },
         onChange(value) {
+          console.log('11111')
           console.log('value: ', value);
         },
       }}
-      rowKey="id"
+      // rowKey="id"
       search={{
         labelWidth: 'auto',
       }}
@@ -177,9 +206,11 @@ const GroupList = () => {
           listsHeight: 400,
         },
       }}
+
       form={{
         // 由于配置了 transform，提交的参数与定义的不同这里需要转化一下
         syncToUrl: (values, type) => {
+          console.log(values)
           if (type === 'get') {
             return {
               ...values,
@@ -188,11 +219,21 @@ const GroupList = () => {
           }
           return values;
         },
+        onChange:(...res)=>{
+          console.log(res)
+        }
       }}
       pagination={{
-        pageSize: 5,
-        onChange: (page) => console.log(page),
+        pageSizeOptions: [5, 10, 20, 50],
+        pageSize: pageParam.pageSize,
+        onChange: (page,pageSize) => {
+          setPageParam({
+            page,
+            pageSize
+          })
+        }
       }}
+
       dateFormatter="string"
       headerTitle="班级列表"
       toolBarRender={() => [
