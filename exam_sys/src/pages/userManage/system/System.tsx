@@ -10,6 +10,8 @@ import Distribution from './components/Distribution'
 
 
 
+
+
 const System = () => {
   const [role, setRole] = useState<List[]>([])
   const [open, setOpen] = React.useState<boolean>(false);
@@ -46,6 +48,25 @@ const System = () => {
          <Button size="middle" type="primary" onClick={()=>{ 
           showLoading()
           setCurRow(record.permission)
+          // const obj: CheckedPer = {
+          //   checked: [],
+          //   halfChecked: []
+          // }
+          // record.permission.forEach(id => {
+          //   // 遍历当前行的权限，判断此权限是不是第一级权限
+          //   const first = permission.find(item => item._id === id)
+          //   if (first) {
+          //     // 如果是第一级权限，并且所有子权限都在当前权限内，表示当前权限可以全选
+          //     if (first.children.every(v => record.permission.includes(v._id))) {
+          //       obj.checked.push(id)
+          //     } else {
+          //       obj.halfChecked.push(id)
+          //     }
+          //   } else {
+          //     obj.checked.push(id)
+          //   }
+          // })
+
           setCurRowId({id: record._id, name: record.name})
          }}>分配角色</Button>
          <Button size="middle" danger type="dashed">删除</Button>
