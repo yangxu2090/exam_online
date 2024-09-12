@@ -116,19 +116,24 @@ const UserOptions = () => {
     <>
     <ProTable<TableListItem>
       columns={columns}
-      request ={ async(para) => {
-        const res = await getUserListApi(params)
+      request ={async (param: { pageSize?: number; current?: number; keyword?: string ;[key :string]:any}) => {
+        console.log(param)
+        const res = await getUserListApi({
+          ...params,
+          username:param.username,
+          password:param.password,
+          creator:param.creator,
+        });
+        const data = res.data.data.list.map(user => ({
+          ...user,
+          status: user.status ?? 1, // 假设默认状态为 1
+        })) as TableListItem[];
+      
         return {
-          data: res.data.data.list,
+          data,
           success: true,
           total: res.data.data.total,
-        }
-      }}
-      search={false}
-      rowKey="_id"
-      headerTitle="样式类"
-      editable={{
-        type: 'multiple',
+        };
       }}
       pagination={{
         pageSizeOptions: [5, 10, 20, 50],

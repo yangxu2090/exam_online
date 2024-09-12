@@ -8,7 +8,8 @@ export type Base<T = any> = {
 // params 类型
 export type Params = {
   page:number,
-  pagesize:number
+  pagesize:number,
+  [key: string] : any
 }
 
 export interface User {
