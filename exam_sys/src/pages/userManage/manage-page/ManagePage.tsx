@@ -87,9 +87,9 @@ const ManagePage = () => {
                 setNumber={setNumber}
                 number={number}
                 isModalOpen={isModalOpen}
-                status={record.status}
-                username={record.username}
-                _id={record._id}
+                status={record.status as 0 | 1}
+                username={record.username!}
+                _id={record._id!}
                 ></ToggleSwitch>
       }
     },
@@ -103,7 +103,7 @@ const ManagePage = () => {
       key: 'password',
       width:'200',
       render:(_, record)=> {
-        return <Passworld password={record.password}></Passworld>
+        return <Passworld password={record.password as string}></Passworld>
       }
     },
     {
